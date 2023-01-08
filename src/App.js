@@ -1,4 +1,4 @@
-// import logo from './logo.svg'
+import logo from './logo.svg'
 // import './App.css'
 
 // Import dependencies
@@ -21,15 +21,15 @@ function App() {
   const [count, setCount] = useState(0)
 
   // Main function
-  // const runCoco = async () => {
-  //   // 3. TODO - Load network
-  //   // e.g. const net = await cocossd.load();
-  //   const net = await cocossd.load()
-  //   //  Loop and detect hands
-  //   setInterval(() => {
-  //     detect(net)
-  //   }, 10)
-  // }
+  const runCoco = async () => {
+    // 3. TODO - Load network
+    // e.g. const net = await cocossd.load();
+    const net = await cocossd.load()
+    //  Loop and detect hands
+    setInterval(() => {
+      detect(net)
+    }, 10)
+  }
   const detect = async (net) => {
     // Check data is available
     if (
@@ -60,11 +60,65 @@ function App() {
     }
   }
   useEffect(() => {
-    console.log('coco')
+    runCoco()
   }, [])
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello world {count}</h1>
+      <div className="relative container md:mx-auto p-6">
+        {/* flex Container */}
+        <div className="flex items-center justify-between">
+          <div className="pt-2">
+            <h2 className="md:text-3xl">Smart Lamp Human Detection</h2>
+          </div>
+        </div>
+
+        {/* Section Content */}
+        <div className="container md:mx-auto">
+          <div className="flex flex-col px-4 mx-auto mt-10 space-y-12 md:space-y-0 md:flex-row">
+            <div className="w-2/3">
+              <Webcam
+                ref={webcamRef}
+                muted={true}
+                style={
+                  {
+                    // position: 'absolute',
+                    // marginLeft: 'auto',
+                    // marginRight: 'auto',
+                    // left: 0,
+                    // right: 0,
+                    // textAlign: 'center',
+                    // zindex: 9,
+                    // width: 640,
+                    // height: 480,
+                  }
+                }
+              />
+              <canvas
+                ref={canvasRef}
+                style={{
+                  position: 'absolute',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  // left: 0,
+                  // right: 0,
+                  // textAlign: 'center',
+                  // zindex: 8,
+                  // width: 640,
+                  // height: 480,
+                }}
+              />
+            </div>
+            <div className="w-1/3">
+              <div className="w-full border-spacing-1">
+                <h3 className="font-semibold">
+                  Jumlah Object Terdeteksi: {count}
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <h1 className="text-3xl font-bold underline">Hello world {count}</h1>
       <Webcam
         ref={webcamRef}
         muted={true}
@@ -93,7 +147,7 @@ function App() {
           width: 640,
           height: 480,
         }}
-      />
+      /> */}
     </>
   )
 }
