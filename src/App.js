@@ -8,6 +8,7 @@ import React, { useRef, useState, useEffect } from 'react'
 // // e.g. import * as tfmodel from "@tensorflow-models/tfmodel";
 import * as cocossd from '@tensorflow-models/coco-ssd'
 import Webcam from 'react-webcam'
+import { io } from 'socket.io-client'
 
 // 2. TODO - Import drawing utility here
 // e.g. import { drawRect } from "./utilities";
@@ -16,6 +17,8 @@ import { drawRect } from './utilities'
 function App() {
   const webcamRef = useRef(null)
   const canvasRef = useRef(null)
+  const [led, setLed] = useState(false)
+  const [socket] = useState(io('http://127.0.0.1:5000/'))
 
   // count Persone
   const [count, setCount] = useState(0)
@@ -52,6 +55,18 @@ function App() {
       const obj = await net.detect(video)
       setCount(obj.length)
 
+      obj.forEach((element) => {
+        if (element.class == 'person') {
+          socket.on('led', (isOn) => {
+            setLed(isOn)
+          })
+        } else {
+          socket.on('led', (isOn) => {
+            setLed(isOn)
+          })
+        }
+      })
+
       // Draw mesh
       const ctx = canvasRef.current.getContext('2d')
       // 5. TODO - Update drawing utility
@@ -76,35 +91,13 @@ function App() {
         <div className="container md:mx-auto">
           <div className="flex flex-col px-4 mx-auto mt-10 space-y-12 md:space-y-0 md:flex-row">
             <div className="w-2/3">
-              <Webcam
-                ref={webcamRef}
-                muted={true}
-                style={
-                  {
-                    // position: 'absolute',
-                    // marginLeft: 'auto',
-                    // marginRight: 'auto',
-                    // left: 0,
-                    // right: 0,
-                    // textAlign: 'center',
-                    // zindex: 9,
-                    // width: 640,
-                    // height: 480,
-                  }
-                }
-              />
+              <Webcam ref={webcamRef} muted={true} />
               <canvas
                 ref={canvasRef}
                 style={{
                   position: 'absolute',
                   marginLeft: 'auto',
                   marginRight: 'auto',
-                  // left: 0,
-                  // right: 0,
-                  // textAlign: 'center',
-                  // zindex: 8,
-                  // width: 640,
-                  // height: 480,
                 }}
               />
             </div>
@@ -118,36 +111,6 @@ function App() {
           </div>
         </div>
       </div>
-      {/* <h1 className="text-3xl font-bold underline">Hello world {count}</h1>
-      <Webcam
-        ref={webcamRef}
-        muted={true}
-        style={{
-          position: 'absolute',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          left: 0,
-          right: 0,
-          textAlign: 'center',
-          zindex: 9,
-          width: 640,
-          height: 480,
-        }}
-      />
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'absolute',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          left: 0,
-          right: 0,
-          textAlign: 'center',
-          zindex: 8,
-          width: 640,
-          height: 480,
-        }}
-      /> */}
     </>
   )
 }
