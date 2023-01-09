@@ -3,7 +3,7 @@ import logo from './logo.svg'
 
 // Import dependencies
 import React, { useRef, useState, useEffect } from 'react'
-// import * as tf from '@tensorflow/tfjs'
+import * as tf from '@tensorflow/tfjs'
 // // 1. TODO - Import required model here
 // // e.g. import * as tfmodel from "@tensorflow-models/tfmodel";
 import * as cocossd from '@tensorflow-models/coco-ssd'
@@ -17,9 +17,7 @@ import { drawRect } from './utilities'
 function App() {
   const webcamRef = useRef(null)
   const canvasRef = useRef(null)
-  const [led, setLed] = useState(false)
-  const [socket] = useState(io('http://127.0.0.1:5000/'))
-
+  const socket = io.connect('http://localhost:5000')
   // count Persone
   const [count, setCount] = useState(0)
 
@@ -56,16 +54,19 @@ function App() {
       setCount(obj.length)
 
       obj.forEach((element) => {
-        if (element.class == 'person') {
-          socket.on('led', (isOn) => {
-            setLed(isOn)
-          })
+        console.log(element)
+        // console.log(element.class === 'person');
+        if (element.class === 'person') {
+          socket.emit('ping', true)
+          console.log('INi orang')
+        } else if (element.class['person'] === '') {
+          socket.emit('dead', false)
         } else {
-          socket.on('led', (isOn) => {
-            setLed(isOn)
-          })
+          socket.emit('dead', false)
+          console.log('ini bukan orang')
         }
       })
+      setCount(obj.length)
 
       // Draw mesh
       const ctx = canvasRef.current.getContext('2d')
@@ -91,15 +92,8 @@ function App() {
         <div className="container md:mx-auto">
           <div className="flex flex-col px-4 mx-auto mt-10 space-y-12 md:space-y-0 md:flex-row">
             <div className="w-2/3">
+              <canvas ref={canvasRef} className="absolute ml-auto mr-auto" />
               <Webcam ref={webcamRef} muted={true} />
-              <canvas
-                ref={canvasRef}
-                style={{
-                  position: 'absolute',
-                  marginLeft: 'auto',
-                  marginRight: 'auto',
-                }}
-              />
             </div>
             <div className="w-1/3">
               <div className="w-full border-spacing-1">
